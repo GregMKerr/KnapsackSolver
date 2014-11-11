@@ -1,0 +1,8 @@
+Usage: <instance filename> <algorithm> [FPTAS num ignored bits] [-v]
+
+ALGORITHM:
+1 - bruteforce
+2 - Greedy (cost/weight ratio heuristic)
+3 - Branch and Bound (cost as bounding factor)
+4 - Dynamic Programming (cost decomposition)
+5 - FPTAS
