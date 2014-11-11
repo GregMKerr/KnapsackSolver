@@ -424,7 +424,7 @@ int FPTAS(std::vector<inst> instances, std::vector<soln> &solutions, int costSte
 int main(int argc, const char** argv) 
 {
 	if (argc < 3 || argc > 5){
-		printf("Unexpected argument count.\nUsage: <filename> <algorithm> [FPTAS num ignored bits] [-v]\n\n");
+		printf("Error: Unexpected argument count.\nUsage: <filename> <algorithm> [FPTAS num ignored bits] [-v]\n\n");
 		printf("ALGORITHM:\n1 - bruteforce\n2 - Greedy (cost/weight ratio heuristic)\n");
 		printf("3 - Branch and Bound (cost as bounding factor)\n4 - Dynamic Programming (cost decomposition)\n");
 		printf("5 - FPTAS\n");
@@ -446,44 +446,53 @@ int main(int argc, const char** argv)
 
 	GetInstances(instances, argv[1], verbose);
 
-	if (std::strncmp(argv[2], "1", 1) == 0)
+	int algo;
+
+	try //C++ style!
 	{
-		printf("Running bruteforce algorithm...\n");
-		Bruteforce(instances, solutions, verbose);
+		algo = std::stoi(argv[2]);
 	}
-	else if (std::strncmp(argv[2], "2", 1) == 0)
+	catch(...)
 	{
-		printf("Running greedy algorithm...\n");
-		Greeeeeedy(instances, solutions, verbose);
+		printf("Error: Invalid algorithm selection");
+		return 1;
 	}
-	else if (std::strncmp(argv[2], "3", 1) == 0)
+
+	switch (algo)
 	{
-		printf("Running recursive B&B algorithm...\n");
-		BBWrapper(instances, solutions, verbose);
+		case 1:
+			printf("Running bruteforce algorithm...\n");
+			Bruteforce(instances, solutions, verbose);
+			break;
+		case 2:
+			printf("Running greedy algorithm...\n");
+			Greeeeeedy(instances, solutions, verbose);
+			break;
+		case 3:
+			printf("Running recursive B&B algorithm...\n");
+			BBWrapper(instances, solutions, verbose);
+			break;
+		case 4:
+			printf("Running dynamic programming algorithm...\n");
+			Dynamic(instances, solutions, verbose);
+			break;
+		case 5:
+			if (argc < 4)
+			{
+				printf("Error: Invalid bin size.\n");
+				return 1;
+			}
+			int errorLevel = atoi(argv[3]); // C style!
+			if (!errorLevel)
+			{
+				printf("Error: Invalid bin size.\n");
+				return 1;
+			}
+			printf("Running FPTAS algorithm (num cost bits ignored: %d)...\n", errorLevel);
+			RoundCosts(instances, errorLevel, verbose);
+			FPTAS(instances, solutions, errorLevel, verbose);
+			break;
 	}
-	else if (std::strncmp(argv[2], "4", 1) == 0)
-	{
-		printf("Running dynamic programming algorithm...\n");
-		Dynamic(instances, solutions, verbose);
-	}
-	else if (std::strncmp(argv[2], "5", 1) == 0)
-	{
-		if (argc < 4)
-		{
-			printf("Invalid bin size.\n");
-			return 1;
-		}
-		int errorLevel = atoi(argv[3]);
-		if (!errorLevel)
-		{
-			printf("Invalid bin size.\n");
-			return 1;
-		}
-		printf("Running FPTAS algorithm (num cost bits ignored: %d)...\n", errorLevel);
-		RoundCosts(instances, errorLevel, verbose);
-		FPTAS(instances, solutions, errorLevel, verbose);
-	}
-	
 
 	instances.clear();
 	solutions.clear();
